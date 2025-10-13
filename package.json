@@ -24,7 +24,7 @@
     "clean": "git clean -xdf .cache dist node_modules",
     "coverage": "vitest run --coverage",
     "format": "prettier --ignore-path .gitignore --write .",
-    "lint": "eslint",
+    "lint": "eslint --fix .",
     "prepack": "unbuild",
     "test": "vitest run",
     "test:watch": "vitest watch",
