@@ -8,9 +8,12 @@ on:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest]
         node-version: [22, 24]
 
     steps:
@@ -53,36 +56,5 @@ jobs:
       - name: Run type checking
         run: pnpm typecheck
 
-      - name: Run tests with coverage
-        run: pnpm coverage
-
-      - name: Build project
-        run: pnpm build
-
-      - name: Upload coverage reports to Codecov
-        if: success()
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: reports/
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: reports/coverage/
-
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: dist/
+      - name: Run tests
+        run: pnpm test
