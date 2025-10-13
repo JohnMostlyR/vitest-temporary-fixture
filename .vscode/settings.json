@@ -1,0 +1,43 @@
+/* https://code.visualstudio.com/docs/getstarted/settings#_settingsjson */
+{
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.quickSuggestions": {
+      "strings": true
+    },
+    "editor.suggest.insertMode": "replace"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": ["ianvs", "mkdist", "sonarjs", "tapjs", "transpiles"],
+  "debug.javascript.terminalOptions": {
+    "resolveSourceMapLocations": [
+      "${workspaceFolder}/**",
+      "!**/node_modules/**",
+      "**/node_modules/.vite-temp/**"
+    ]
+  },
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "explorer.fileNesting.patterns": {
+    "package.json": "pnpm-workspace.yaml, pnpm-lock.yaml"
+  },
+  "npm.packageManager": "pnpm",
+  "search.exclude": {
+    "pnpm-lock.yaml": true
+  },
+  "vitest.disableWorkspaceWarning": true
+}
