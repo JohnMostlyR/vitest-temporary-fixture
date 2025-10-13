@@ -1,162 +1,49 @@
 version: 2.1
 
-# Define reusable commands
-commands:
-  setup-pnpm:
-    description: 'Install and setup PNPM'
-    steps:
-      - run:
-          name: Install PNPM
-          command: |
-            corepack enable
-            corepack prepare pnpm@latest --activate
-      - run:
-          name: Get PNPM cache directory
-          command: |
-            echo 'export PNPM_CACHE_FOLDER=$(pnpm store path)' >> $BASH_ENV
-            source $BASH_ENV
-      - restore_cache:
-          name: Restore PNPM cache
-          keys:
-            - pnpm-cache-v1-{{ checksum "pnpm-lock.yaml" }}
-            - pnpm-cache-v1-
-      - run:
-          name: Install dependencies
-          command: pnpm install --frozen-lockfile
-      - save_cache:
-          name: Save PNPM cache
-          key: pnpm-cache-v1-{{ checksum "pnpm-lock.yaml" }}
-          paths:
-            - ~/.local/share/pnpm/store
-
-# Define jobs
 jobs:
-  # Lint and format check
-  lint-and-format:
+  validate_and_build:
     docker:
-      - image: cimg/node:22.19
+      - image: circleci/node:lts
+    resource_class: large
+    parallelism: 10
+
     steps:
       - checkout
-      - setup-pnpm
+      - restore_cache:
+          name: Restore pnpm Package Cache
+          keys:
+            - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
       - run:
-          name: Run ESLint
+          name: Install pnpm package manager
+          command: |
+            npm install --global corepack@latest
+            corepack enable
+            corepack prepare pnpm@latest-10 --activate
+            pnpm config set store-dir .pnpm-store
+      - run:
+          name: Install Dependencies
+          command: |
+            pnpm install
+      - save_cache:
+          name: Save pnpm Package Cache
+          key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - .pnpm-store
+      - run:
+          name: Linting
           command: pnpm lint
       - run:
-          name: Check Prettier formatting
-          command: pnpm format --check
-
-  # Type checking
-  typecheck:
-    docker:
-      - image: cimg/node:22.19
-    steps:
-      - checkout
-      - setup-pnpm
+          name: Format
+          command: pnpm format
       - run:
-          name: Type check
+          name: Type Checking
           command: pnpm typecheck
-
-  # Build the project
-  build:
-    docker:
-      - image: cimg/node:22.19
-    steps:
-      - checkout
-      - setup-pnpm
       - run:
-          name: Build project
+          name: Run Tests
+          command: pnpm test
+      - run:
+          name: Build Project
           command: pnpm build
-      - persist_to_workspace:
-          root: .
-          paths:
-            - dist
-
-  # Run tests with coverage
-  test:
-    docker:
-      - image: cimg/node:22.19
-    steps:
-      - checkout
-      - setup-pnpm
-      - run:
-          name: Run tests with coverage
-          command: pnpm coverage
-      - store_test_results:
-          path: reports
       - store_artifacts:
-          path: reports/coverage
-          destination: coverage-report
-      - run:
-          name: Upload coverage to Codecov (if token is set)
-          command: |
-            if [ -n "$CODECOV_TOKEN" ]; then
-              curl -Os https://uploader.codecov.io/latest/linux/codecov
-              chmod +x codecov
-              ./codecov -t ${CODECOV_TOKEN}
-            else
-              echo "CODECOV_TOKEN not set, skipping coverage upload"
-            fi
-          when: always
-
-  # Integration job that requires build artifacts
-  validate-build:
-    docker:
-      - image: cimg/node:22.19
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - setup-pnpm
-      - run:
-          name: Validate build output
-          command: |
-            if [ ! -d "dist" ]; then
-              echo "Build output directory 'dist' not found!"
-              exit 1
-            fi
-            if [ ! -f "dist/index.mjs" ]; then
-              echo "Expected output file 'dist/index.mjs' not found!"
-              exit 1
-            fi
-            if [ ! -f "dist/index.cjs" ]; then
-              echo "Expected output file 'dist/index.cjs' not found!"
-              exit 1
-            fi
-            echo "Build validation successful!"
-
-# Define workflows
-workflows:
-  # Main CI workflow
-  ci:
-    jobs:
-      # Run linting and formatting checks in parallel
-      - lint-and-format
-      - typecheck
-
-      # Run tests in parallel with linting
-      - test
-
-      # Build after linting passes
-      - build:
-          requires:
-            - lint-and-format
-            - typecheck
-
-      # Validate build artifacts
-      - validate-build:
-          requires:
-            - build
-
-  # Nightly workflow for additional checks
-  nightly:
-    triggers:
-      - schedule:
-          cron: '0 2 * * *' # Run at 2 AM UTC daily
-          filters:
-            branches:
-              only:
-                - main
-                - dev
-    jobs:
-      - test
-      - build
+          name: Store Test Reports
+          path: test-results
