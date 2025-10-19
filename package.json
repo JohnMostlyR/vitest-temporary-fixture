@@ -1,6 +1,6 @@
 {
   "name": "vitest-temporary-fixture",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Create temporary directories and fixtures on the fly for Vitest tests.",
   "keywords": [
     "vitest",
@@ -66,9 +66,12 @@
     "prettier": "3.6.2",
     "rimraf": "6.0.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.46.1",
+    "typescript-eslint": "8.46.0",
     "unbuild": "3.6.1",
     "unique-string": "3.0.0",
     "vitest": "3.2.4"
+  },
+  "peerDependencies": {
+    "vitest": ">=3.0.0"
   }
 }

@@ -103,8 +103,13 @@ class TestFixturesAsync {
       await FixtureAsync.make(this.#testDir, content || {});
       this.#createdTestDir = true;
 
-      onTestFailed(() => this.#handleTestEnd());
-      onTestFinished(() => this.#handleTestEnd());
+      /* Register cleanup hooks - wrap in try-catch to handle cases where hooks are not available */
+      try {
+        onTestFailed(() => this.#handleTestEnd());
+        onTestFinished(() => this.#handleTestEnd());
+      } catch {
+        /* Hooks not available in this context, cleanup will need to be manual */
+      }
 
       return this.#testDir;
     } catch (err) {
