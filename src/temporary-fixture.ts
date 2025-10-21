@@ -98,17 +98,17 @@ class TestFixtures {
    */
   createTestDir(content: FixtureDirContent) {
     try {
+      // Reset state for each test directory creation
+      this.#testFinished = false;
+      this.#createdTestDir = false;
+
       this.#testDir = fs.mkdtempSync(join(tmpdir(), 'vitest_'));
       Fixture.make(this.#testDir, content || {});
       this.#createdTestDir = true;
 
-      /* Register cleanup hooks - wrap in try-catch to handle cases where hooks are not available */
-      try {
-        onTestFailed(() => this.#handleTestEnd());
-        onTestFinished(() => this.#handleTestEnd());
-      } catch {
-        /* Hooks not available in this context, cleanup will need to be manual */
-      }
+      /* Register cleanup hooks */
+      onTestFailed(() => this.#handleTestEnd());
+      onTestFinished(() => this.#handleTestEnd());
 
       return this.#testDir;
     } catch (err) {
