@@ -1,12 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
+    "config:recommended",
     ":dependencyDashboard",
     ":semanticCommits",
     "schedule:weekly"
   ],
-  "baseBranches": ["dev"],
+  "baseBranchPatterns": ["dev"],
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["security"]
