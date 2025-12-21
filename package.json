@@ -69,7 +69,7 @@
     "typescript-eslint": "8.50.0",
     "unbuild": "3.6.1",
     "unique-string": "3.0.0",
-    "vitest": "4.0.15"
+    "vitest": "4.0.16"
   },
   "peerDependencies": {
     "vitest": ">=3.0.0"
