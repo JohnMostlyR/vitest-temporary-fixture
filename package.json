@@ -63,10 +63,10 @@
     "@vitest/coverage-v8": "^4.0.0",
     "eslint": "9.39.2",
     "eslint-plugin-sonarjs": "3.0.5",
-    "prettier": "3.7.4",
+    "prettier": "3.8.1",
     "rimraf": "6.1.2",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.51.0",
+    "typescript-eslint": "8.54.0",
     "unbuild": "3.6.1",
     "unique-string": "3.0.0",
     "vitest": "4.0.16"
