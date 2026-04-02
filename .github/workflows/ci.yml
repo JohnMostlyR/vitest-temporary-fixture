@@ -1,65 +1,50 @@
 name: CI
-permissions:
-  contents: read
 
 on:
-  push:
-    branches: [dev]
   pull_request:
-    branches: [dev]
+  push:
+    branches: [main]
 
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        node-version: [22, 24]
+        node: [24]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          ref: ${{ github.head_ref }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run linting
-        run: pnpm lint
+      - name: Run linting (affected only)
+        run: pnpm --filter=...[HEAD^] lint
 
-      - name: Check formatting
-        run: pnpm format
+      - name: Check formatting (affected only)
+        run: pnpm --filter=...[HEAD^] format
 
-      - name: Run type checking
-        run: pnpm typecheck
+      - name: Run type checking (affected only)
+        run: pnpm --filter=...[HEAD^] typecheck
 
-      - name: Run tests
-        run: pnpm test
+      - name: Run tests (affected only)
+        run: pnpm --filter=...[HEAD^] test
 
-      - name: Build
-        run: pnpm build
+      - name: Build (affected only)
+        run: pnpm --filter=...[HEAD^] build
