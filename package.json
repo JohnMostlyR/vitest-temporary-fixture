@@ -46,12 +46,15 @@
     "build": "unbuild",
     "clean": "git clean -xdf .cache dist node_modules",
     "coverage": "vitest run --coverage",
-    "format": "prettier --ignore-path .gitignore --write .",
+    "deps:check": "pnpm update --interactive",
+    "deps:update": "pnpm update",
+    "deps:verify": "pnpm validate",
+    "format": "prettier --ignore-path .prettierignore --list-different --write .",
     "lint": "eslint --fix .",
-    "prepack": "unbuild",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "validate": "pnpm lint && pnpm format && pnpm typecheck && pnpm coverage && pnpm build"
   },
   "dependencies": {
     "mkdirp": "^3.0.1"
