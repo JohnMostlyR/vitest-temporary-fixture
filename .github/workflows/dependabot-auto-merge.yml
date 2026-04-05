@@ -22,14 +22,7 @@ jobs:
 
       - name: Auto-merge safe updates
         if: |
-          steps.metadata.outputs.update-type != 'version-update:semver-major' &&
-          (
-            steps.metadata.outputs.dependency-type == 'development' ||
-            steps.metadata.outputs.security-advisory-ids != '' ||
-            steps.metadata.outputs.dependency-names == '@types' ||
-            steps.metadata.outputs.dependency-names == 'eslint' ||
-            steps.metadata.outputs.dependency-names == 'prettier'
-          )
+          contains(fromJSON('["version-update:semver-minor", "version-update:semver-patch"]'), steps.metadata.outputs.update-type)
         run: |
           gh pr merge --auto --squash "$PR_URL"
         env:
